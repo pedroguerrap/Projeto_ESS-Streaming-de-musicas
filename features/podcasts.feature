@@ -40,3 +40,7 @@ Then o sistema deve permitir escolher o fuso horario
 Scenario: Upload longo
 Given um arquivo de audio de 5 horas
 Then o sistema deve aceitar sem limite de duracao
+
+Scenario: Ouvir podcast offline
+Given que o usuario baixou o episodio
+Then ele deve conseguir ouvir sem internet com qualidade normal
