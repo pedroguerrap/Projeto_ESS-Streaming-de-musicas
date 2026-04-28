@@ -1,32 +1,31 @@
-Feature Validar dados ao criar playlist
-  
-  Scenario nome de playlist maior que o limite
-    Given o usuário está na tela de criação de playlist
-    And o nome da playlist foi preencido com o valor "ESSA É UMA STRING COM MAIS DE 50 CARACTERES AAAAAAA"
-    When o usuário pressionar em criar playlist
-    Then o sistema rejeita a requisição
-    And retorna uma mensagem de erro de validação
+Feature: Funcionalidades gerais de podcasts
 
-  Scenario nome de playlist nulo
-    Given o usuário está na tela de criação de playlist
-    And o nome da playlist foi preencido com o valor ""
-    When o usuário pressionar em criar playlist
-    Then o sistema rejeita a requisição
-    And retorna uma mensagem de erro de validação
-  
-  Scenario nome de playlist é válido
-    Given o usuário está na tela de criação de playlist
-    And o nome da playlist foi preencido com o valor "Pedro"
-    When o usuário pressionar em criar playlist
-    Then a playlist é criada com sucesso
-    And data e dono são preenchidos automaticamente # ISSO DE (data, dono) É UMA VALIDAÇÃO A MAIS. TU PODERIA QUEBRAR ISSO EM OUTRO CENÁRIO SE QUISER, MAS DO JEITO QUE TU FEZ TAMBÉM TA CERTO
-  
-  Scenario controle de acesso à playlist privada
-    Given o usuário "fulano" seta a playlist "minha playlist" como privada
-    When o usuário "fulano" acessar a playslist "minha playlsit"
-    Then o acesso é permitido
+  Scenario: Contabilizar acesso ao iniciar reprodução de episódio
+    Given existe um episódio de podcast publicado com total de acessos igual a 10
+    When um usuário iniciar a reprodução desse episódio
+    Then o total de acessos do episódio passa a ser 11
 
-  Scenario controle de acesso à playlist privada
-    Given o usuário "fulano" seta a playlist "minha playlist" como privada
-    When o usuário "siclano" acessar a playslist "minha playlsit"
-    Then o acesso é negado
+  Scenario: Exibir total de acessos para qualquer usuário
+    Given existe um episódio de podcast publicado com total de acessos igual a 25
+    When um usuário visitar a página do episódio
+    Then o sistema exibe o total de acessos igual a 25
+
+  Scenario: Programar postagem de novo episódio para data futura
+    Given o criador está na tela de criação de episódio
+    And informou título, descrição e arquivo de áudio válido
+    And definiu uma data futura para publicação
+    When confirmar a criação do episódio
+    Then o episódio fica agendado para a data informada
+
+  Scenario: Fazer download do arquivo bruto com usuário autenticado
+    Given existe um episódio de podcast publicado
+    And o usuário está autenticado
+    When o usuário solicitar o download do arquivo bruto do episódio
+    Then o sistema permite o download
+
+  Scenario: Bloquear download do arquivo bruto sem autenticação
+    Given existe um episódio de podcast publicado
+    And o usuário não está autenticado
+    When o usuário solicitar o download do arquivo bruto do episódio
+    Then o sistema bloqueia o download
+    And retorna a mensagem "É necessário estar logado para baixar este episódio"
