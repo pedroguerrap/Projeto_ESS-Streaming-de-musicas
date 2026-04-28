@@ -1,46 +1,32 @@
-Feature: Processamento de Áudio
-Scenario: Upload de arquivo com formato inválido
-Given que o serviço de upload recebeu um arquivo "aula_01.pdf"
-When o validador de formato processar o arquivo
-Then o sistema deve rejeitar o arquivo
-And retornar o erro "Formato de arquivo não suportado. Utilize apenas MP3 ou WAV."
+Feature Validar dados ao criar playlist
+  
+  Scenario nome de playlist maior que o limite
+    Given o usuário está na tela de criação de playlist
+    And o nome da playlist foi preencido com o valor "ESSA É UMA STRING COM MAIS DE 50 CARACTERES AAAAAAA"
+    When o usuário pressionar em criar playlist
+    Then o sistema rejeita a requisição
+    And retorna uma mensagem de erro de validação
 
-Feature: Download de Episódio
-Scenario: Tentativa de download por usuário não autenticado
-Given que um visitante não logado acessa a página do episódio "Episódio 1"
-When o visitante clica no botão de "Baixar arquivo"
-Then o sistema deve bloquear o download
-And exibir a mensagem de erro "É necessário estar logado para baixar o podcast."
+  Scenario nome de playlist nulo
+    Given o usuário está na tela de criação de playlist
+    And o nome da playlist foi preencido com o valor ""
+    When o usuário pressionar em criar playlist
+    Then o sistema rejeita a requisição
+    And retorna uma mensagem de erro de validação
+  
+  Scenario nome de playlist é válido
+    Given o usuário está na tela de criação de playlist
+    And o nome da playlist foi preencido com o valor "Pedro"
+    When o usuário pressionar em criar playlist
+    Then a playlist é criada com sucesso
+    And data e dono são preenchidos automaticamente # ISSO DE (data, dono) É UMA VALIDAÇÃO A MAIS. TU PODERIA QUEBRAR ISSO EM OUTRO CENÁRIO SE QUISER, MAS DO JEITO QUE TU FEZ TAMBÉM TA CERTO
+  
+  Scenario controle de acesso à playlist privada
+    Given o usuário "fulano" seta a playlist "minha playlist" como privada
+    When o usuário "fulano" acessar a playslist "minha playlsit"
+    Then o acesso é permitido
 
-Feature: Upload de Conteúdo
-Scenario: Tentativa de upload de arquivo contendo vídeo
-Given que um criador tenta fazer o upload do arquivo "videocast.mp4"
-When o sistema valida o tipo de mídia do arquivo
-Then o upload deve ser rejeitado
-And o sistema deve exibir a mensagem de erro "Apenas arquivos de áudio são permitidos."
-
-Feature: Métricas de Popularidade
-Scenario: Visualização de acessos totais por usuários externos
-Given que o episódio "Engenharia de Software 101" possui 500 acessos
-When um visitante anônimo acessa a página do podcast
-Then o sistema deve exibir o contador com "500 acessos"
-And essa informação deve estar disponível publicamente
-
-Feature: Gerenciamento de Episódios
-Scenario: Atualização de arquivo de áudio sem manter histórico
-Given que o criador tem um episódio "Episódio 1" publicado
-When ele faz o upload de um novo arquivo de áudio para atualizar o "Episódio 1"
-Then o sistema deve substituir o arquivo anterior permanentemente
-And não deve manter o histórico da versão antiga, economizando espaço
-
-Scenario: Definir fuso horario
-Given que o criador quer agendar um podcast
-Then o sistema deve permitir escolher o fuso horario
-
-Scenario: Upload longo
-Given um arquivo de audio de 5 horas
-Then o sistema deve aceitar sem limite de duracao
-
-Scenario: Ouvir podcast offline
-Given que o usuario baixou o episodio
-Then ele deve conseguir ouvir sem internet com qualidade normal
+  Scenario controle de acesso à playlist privada
+    Given o usuário "fulano" seta a playlist "minha playlist" como privada
+    When o usuário "siclano" acessar a playslist "minha playlsit"
+    Then o acesso é negado
